@@ -1,0 +1,20 @@
+{
+  "name": "plafon-end-user-jg",
+  "version": "1.0.0",
+  "description": "Plafon End User Juragan Gadai",
+  "homepage": "https://github.com/mroczect/plafon-end-user-jg#readme",
+  "bugs": {
+    "url": "https://github.com/mroczect/plafon-end-user-jg/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mroczect/plafon-end-user-jg.git"
+  },
+  "license": "AGPL-3.0",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
