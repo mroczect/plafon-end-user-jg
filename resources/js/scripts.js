@@ -13,7 +13,7 @@ const tableBody = document.getElementById('table-body');
 const infoCounter = document.getElementById('info-counter');
 const resetBtn = document.getElementById('reset-filters');
 
-// Format Rupiah cepat
+// Format Rupiah
 function formatRupiah(value) {
   if (value === undefined || value === null || value === '') return '—';
   const num = Number(value);
@@ -31,25 +31,24 @@ function escapeHtml(str) {
   });
 }
 
-// Header + filter row dengan ikon di placeholder
+// Header dengan filter (tanpa emoji)
 function buildHeader() {
   let headerHtml = '<tr>';
   for (let col of headers) {
     headerHtml += `<th>${escapeHtml(col)}</th>`;
   }
-  headerHtml += '</tr><tr class="filter-row">';
+  headerHtml += '<tr><tr class="filter-row">';
   for (let col of headers) {
-    let placeholderText = col === 'MODEL' ? '🔍 Cari model...' : '🔎 Filter tahun...';
+    let placeholderText = col === 'MODEL' ? 'Cari model...' : 'Filter tahun...';
     headerHtml += `<th><input type="text" class="filter-input" data-col="${col}" placeholder="${placeholderText}"></th>`;
   }
-  headerHtml += '<tr>';
+  headerHtml += '</tr>';
   tableHeader.innerHTML = headerHtml;
 
   document.querySelectorAll('.filter-input').forEach(input => {
     input.addEventListener('input', (e) => {
       const col = e.target.dataset.col;
       filterValues[col] = e.target.value.toLowerCase();
-      // Debounce untuk performa
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         applyFilters();
@@ -58,11 +57,11 @@ function buildHeader() {
   });
 }
 
-// Render tabel + animasi fade singkat (tanpa reflow berat)
+// Render tabel
 function renderTable(data) {
   if (!data.length) {
-    tableBody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center; padding:2rem;">✨ Tidak ada data yang cocok ✨</td></tr>`;
-    infoCounter.innerHTML = `📊 0 / ${masterData.length} data`;
+    tableBody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center; padding:2rem;">Tidak ada data yang cocok</td></tr>`;
+    infoCounter.innerHTML = `<i class="fas fa-database"></i> 0 / ${masterData.length} data`;
     return;
   }
 
@@ -79,17 +78,16 @@ function renderTable(data) {
     }
     html += '</tr>';
   }
-  // Animasi halus via opasitas (tambahkan class fade)
+  // animasi fade
   tableBody.style.opacity = '0.6';
   tableBody.innerHTML = html;
   requestAnimationFrame(() => {
     tableBody.style.transition = 'opacity 0.12s';
     tableBody.style.opacity = '1';
   });
-  infoCounter.innerHTML = `✨ ${data.length} / ${masterData.length} data ✨`;
+  infoCounter.innerHTML = `<i class="fas fa-filter"></i> ${data.length} / ${masterData.length} data`;
 }
 
-// Filter AND cepat
 function getFilteredData() {
   const activeCols = Object.keys(filterValues).filter(col => filterValues[col] && filterValues[col].trim() !== '');
   if (activeCols.length === 0) return masterData.slice();
@@ -119,8 +117,8 @@ function resetFilters() {
     input.value = '';
   });
   applyFilters();
-  // Efek mini: sentuhan pada tombol reset via class flash (optional)
-  resetBtn.style.transform = 'scale(0.97)';
+  // efek click
+  resetBtn.style.transform = 'scale(0.96)';
   setTimeout(() => { resetBtn.style.transform = ''; }, 150);
 }
 
@@ -132,12 +130,12 @@ function loadCSV() {
     skipEmptyLines: true,
     complete: (results) => {
       if (!results.data || results.data.length === 0) {
-        loadingDiv.innerHTML = '❌ CSV tidak ditemukan atau kosong. Periksa path: ./resources/data/table.csv';
+        loadingDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> CSV tidak ditemukan atau kosong. Periksa path: ./resources/data/table.csv';
         return;
       }
       headers = results.meta.fields;
       if (!headers || headers.length === 0) {
-        loadingDiv.innerHTML = '❌ Header CSV rusak.';
+        loadingDiv.innerHTML = '<i class="fas fa-bug"></i> Header CSV rusak.';
         return;
       }
       masterData = results.data;
@@ -149,13 +147,11 @@ function loadCSV() {
       tableContainer.style.display = 'block';
     },
     error: (err) => {
-      loadingDiv.innerHTML = `⚠️ Gagal muat CSV: ${err.message}. Cek koneksi / path file.`;
+      loadingDiv.innerHTML = `<i class="fas fa-circle-exclamation"></i> Gagal muat CSV: ${err.message}. Cek koneksi / path file.`;
       console.error(err);
     }
   });
 }
 
 resetBtn.addEventListener('click', resetFilters);
-
-// Mulai
 loadCSV();
